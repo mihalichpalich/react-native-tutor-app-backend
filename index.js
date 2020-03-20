@@ -6,7 +6,7 @@ app.get('/test', function(req, res) {
     return res.send("Hello!");
 });
 
-app.listen(6666, function (err) {
+app.listen(3000, function (err) {
     if (err) {
         return console.log(err)
     }
