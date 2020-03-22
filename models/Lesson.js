@@ -3,11 +3,11 @@ const {Schema} = mongoose;
 
 const LessonSchema = new Schema(
     {
-        userId: {type: Schema.Types.ObjectId, ref: "Student"},
         lessonNum: Number,
         unit: String,
         date: String,
-        time: String
+        time: String,
+        student: {type: Schema.Types.ObjectId, ref: "Student"},
     },
     {
         timestamps: true

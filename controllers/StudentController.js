@@ -5,25 +5,25 @@ function StudentController() {
 }
 
 const create = function(req, res) {
+    const errors = validationResult(req);
+
     const data = {
         fullname: req.body.fullname,
         phone: req.body.phone
     };
 
-    Student.create(data, function (err, doc) {
-        const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({
+            status: false,
+            message: errors.array()
+        });
+    }
 
+    Student.create(data, function (err, doc) {
         if (err) {
             return res.status(500).json({
                 status: false,
                 message: err
-            });
-        }
-
-        if (!errors.isEmpty()) {
-            return res.status(422).json({
-                status: false,
-                message: errors.array()
             });
         }
 
