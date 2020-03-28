@@ -15,6 +15,7 @@ app.post('/students', studentValidation.create, StudentCtrl.create);
 
 app.get('/lesson', LessonCtrl.all);
 app.post('/lesson', lessonValidation.create, LessonCtrl.create);
+app.delete('/lesson/:id', lessonValidation.create, LessonCtrl.remove);
 
 app.listen(3000, function (err) {
     if (err) {
