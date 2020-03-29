@@ -9,7 +9,6 @@ const create = async function(req, res) {
 
     const data = {
         student: req.body.student,
-        lessonNum: req.body.lessonNum,
         unit: req.body.unit,
         date: req.body.date,
         time: req.body.time
@@ -22,12 +21,21 @@ const create = async function(req, res) {
         });
     }
 
+    try {
+        await Student.findOne({_id: data.student});
+    } catch (e) {
+        return res.status(404).json({
+            success: false,
+            message: "STUDENT_NOT_FOUND"
+        });
+    }
+
     const student = await Student.findOne({_id: data.student});
 
     if (!student) {
         return res.status(404).json({
             status: false,
-            message: 'PATIENT_NOT_FOUND'
+            message: 'STUDENT_NOT_FOUND'
         });
     }
 
@@ -40,18 +48,69 @@ const create = async function(req, res) {
         }
 
         res.status(201).json({
-            status: true,
-            data: doc
+            status: true
         });
     })
 };
 
-const remove = function (req, res) {
-    const id = req.query.id;
-    Student.deleteOne({_id: id}, (err) => {
+const update = async function(req, res) {
+    const lessonId = req.params.id;
+    const errors = validationResult(req);
+
+    const data = {
+        unit: req.body.unit,
+        date: req.body.date,
+        time: req.body.time
+    };
+
+    if (!errors.isEmpty()) {
+        return res.status(422).json({
+            status: false,
+            message: errors.array()
+        });
+    }
+
+    Lesson.updateOne(
+        {_id: lessonId},
+        {$set: data},
+        function (err, doc) {
+            if (err) {
+                return res.status(500).json({
+                    status: false,
+                    message: err
+                });
+            }
+
+            if (!doc) {
+                return res.status(404).json({
+                    success: false,
+                    message: "LESSON_NOT_FOUND"
+                });
+            }
+
+            res.json({
+                status: true,
+                data: doc
+            });
+    })
+};
+
+const remove = async function (req, res) {
+    const id = req.params.id;
+
+    try {
+        await Lesson.findOne({ _id: id });
+    } catch (e) {
+            return res.status(404).json({
+                success: false,
+                message: 'LESSON_NOT_FOUND'
+            });
+    }
+
+    Lesson.deleteOne({_id: id}, (err) => {
         if (err) {
             return res.status(500).json({
-                status: false,
+                success: false,
                 message: err
             });
         }
@@ -72,8 +131,7 @@ const all = function (req, res) {
         }
 
         res.json({
-            status: "success",
-            data: docs
+            status: "success"
         });
     });
 };
@@ -81,7 +139,8 @@ const all = function (req, res) {
 LessonController.prototype = {
     all,
     create,
-    remove
+    remove,
+    update
 };
 
 module.exports = LessonController;

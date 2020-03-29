@@ -3,7 +3,6 @@ const {Schema} = mongoose;
 
 const LessonSchema = new Schema(
     {
-        lessonNum: Number,
         unit: String,
         date: String,
         time: String,

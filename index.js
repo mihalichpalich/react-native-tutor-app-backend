@@ -12,10 +12,13 @@ app.use(cors());
 
 app.get('/students', StudentCtrl.all);
 app.post('/students', studentValidation.create, StudentCtrl.create);
+app.delete('/students/:id', StudentCtrl.remove);
+app.patch('/students/:id', studentValidation.create, StudentCtrl.update);
 
 app.get('/lesson', LessonCtrl.all);
 app.post('/lesson', lessonValidation.create, LessonCtrl.create);
-app.delete('/lesson/:id', lessonValidation.create, LessonCtrl.remove);
+app.delete('/lesson/:id', LessonCtrl.remove);
+app.patch('/lesson/:id', lessonValidation.update, LessonCtrl.update);
 
 app.listen(3000, function (err) {
     if (err) {
