@@ -19,7 +19,7 @@ const create = function(req, res) {
         });
     }
 
-    Student.create(data, function (err) {
+    Student.create(data, function (err, doc) {
         if (err) {
             return res.status(500).json({
                 status: false,
@@ -28,13 +28,14 @@ const create = function(req, res) {
         }
 
         res.status(201).json({
-            status: true
+            status: true,
+            data: doc
         });
     })
 };
 
 const update = async function(req, res) {
-    const lessonId = req.params.id;
+    const studentId = req.params.id;
     const errors = validationResult(req);
 
     const data = {
@@ -99,8 +100,26 @@ const remove = async function (req, res) {
     });
 };
 
+const show = async function(req, res) {
+    const id = req.params.id;
+
+    try {
+        const student = await Student.findById(id).populate('lessons').exec();
+
+        res.json({
+            status: true,
+            data: {...student._doc, lessons: student.lessons}
+        });
+    } catch (e) {
+        return res.status(404).json({
+            status: false,
+            message: 'STUDENT_NOT_FOUND'
+        });
+    }
+};
+
 const all = function (req, res) {
-    Student.find({}, function (err) {
+    Student.find({}, function (err, docs) {
         if (err) {
             return res.status(500).json({
                 status: false,
@@ -109,7 +128,8 @@ const all = function (req, res) {
         }
 
         res.json({
-            status: true
+            status: true,
+            data: docs
         });
     });
 };
@@ -118,7 +138,8 @@ StudentController.prototype = {
     all,
     create,
     update,
-    remove
+    remove,
+    show
 };
 
 module.exports = StudentController;

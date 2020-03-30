@@ -1,11 +1,15 @@
 const {validationResult} = require('express-validator');
+const dayjs = require('dayjs');
 const {Lesson, Student} = require('../models');
+
+const {sendSMS} = require('../utils');
 
 function LessonController() {
 }
 
 const create = async function(req, res) {
     const errors = validationResult(req);
+    let student;
 
     const data = {
         student: req.body.student,
@@ -22,20 +26,11 @@ const create = async function(req, res) {
     }
 
     try {
-        await Student.findOne({_id: data.student});
+        student = await Student.findOne({_id: data.student});
     } catch (e) {
         return res.status(404).json({
             success: false,
             message: "STUDENT_NOT_FOUND"
-        });
-    }
-
-    const student = await Student.findOne({_id: data.student});
-
-    if (!student) {
-        return res.status(404).json({
-            status: false,
-            message: 'STUDENT_NOT_FOUND'
         });
     }
 
@@ -46,6 +41,24 @@ const create = async function(req, res) {
                 message: err
             });
         }
+
+        const delayedTime = dayjs(
+            `${data.date
+                .split('.')
+                .reverse()
+                .join('.')}T${data.time}`)
+            .subtract(1, 'minute')
+            .unix();
+
+        sendSMS({
+            number: student.phone,
+            time: delayedTime,
+            text: `Добрый день, ${student.fullname}! Сегодня в ${data.time} у вас урок`
+        }).then(({data}) => {
+            console.log(data);
+        }).catch(err => {
+            console.log(err);
+        });
 
         res.status(201).json({
             status: true
@@ -131,7 +144,8 @@ const all = function (req, res) {
         }
 
         res.json({
-            status: "success"
+            status: "success",
+            data: docs
         });
     });
 };

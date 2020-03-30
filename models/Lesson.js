@@ -6,7 +6,7 @@ const LessonSchema = new Schema(
         unit: String,
         date: String,
         time: String,
-        student: {type: Schema.Types.ObjectId, ref: "Student"},
+        student: {type: Schema.Types.ObjectId, ref: "Student"}
     },
     {
         timestamps: true
