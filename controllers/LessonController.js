@@ -1,7 +1,8 @@
 const {validationResult} = require('express-validator');
 const dayjs = require('dayjs');
-const {Lesson, Student} = require('../models');
+const {groupBy, reduce} = require('lodash');
 
+const {Lesson, Student} = require('../models');
 const {sendSMS} = require('../utils');
 
 function LessonController() {
@@ -135,7 +136,9 @@ const remove = async function (req, res) {
 };
 
 const all = function (req, res) {
-    Lesson.find({}).populate('student').exec(function (err, docs) {
+    Lesson.find({})
+        .populate('student')
+        .exec(function (err, docs) {
         if (err) {
             return res.status(500).json({
                 status: false,
@@ -145,7 +148,12 @@ const all = function (req, res) {
 
         res.json({
             status: "success",
-            data: docs
+            data: reduce(
+                groupBy(docs, 'date'),
+                (result, value, key) => {
+                result = [...result, {title: key, data: value}];
+                return result;
+            }, [])
         });
     });
 };
