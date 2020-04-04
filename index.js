@@ -15,11 +15,13 @@ app.use(cors());
 
 app.get('/students', StudentCtrl.all);
 app.get('/students/:id', StudentCtrl.show);
+app.get('/students/getbyphone/:phone', StudentCtrl.getByPhone);
 app.post('/students', studentValidation.create, StudentCtrl.create);
 app.delete('/students/:id', StudentCtrl.remove);
 app.patch('/students/:id', studentValidation.create, StudentCtrl.update);
 
 app.get('/lesson', LessonCtrl.all);
+app.get('/lesson/:id', LessonCtrl.show);
 app.post('/lesson', lessonValidation.create, LessonCtrl.create);
 app.delete('/lesson/:id', LessonCtrl.remove);
 app.patch('/lesson/:id', lessonValidation.update, LessonCtrl.update);

@@ -118,6 +118,24 @@ const show = async function(req, res) {
     }
 };
 
+const getByPhone = async function(req, res) {
+    const phone = req.params.phone;
+
+    try {
+        const student = await Student.findOne({phone: phone}).exec();
+
+        res.json({
+            status: true,
+            data: {student}
+        });
+    } catch (e) {
+        return res.status(404).json({
+            status: false,
+            message: 'STUDENT_NOT_FOUND'
+        });
+    }
+};
+
 const all = function (req, res) {
     Student.find({}, function (err, docs) {
         if (err) {
@@ -139,7 +157,8 @@ StudentController.prototype = {
     create,
     update,
     remove,
-    show
+    show,
+    getByPhone
 };
 
 module.exports = StudentController;

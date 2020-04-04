@@ -5,7 +5,10 @@ const StudentSchema = new Schema(
     {
         id: String,
         fullname: String,
-        phone: String
+        phone: {
+            type: String,
+            unique: true
+        }
     },
     {
         timestamps: true
