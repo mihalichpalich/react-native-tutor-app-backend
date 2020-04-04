@@ -172,6 +172,8 @@ const show = async function(req, res) {
 const all = function (req, res) {
     Lesson.find({})
         .populate('student')
+        .sort('date')
+        .sort('time')
         .exec(function (err, docs) {
         if (err) {
             return res.status(500).json({
