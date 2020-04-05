@@ -104,7 +104,7 @@ const show = async function(req, res) {
     const id = req.params.id;
 
     try {
-        const student = await Student.findById(id).populate('lessons').exec();
+        const student = await Student.findById(id).populate({path: 'lessons', options: {sort: {date: 1}}}).exec();
 
         res.json({
             status: true,

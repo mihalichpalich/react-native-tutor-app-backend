@@ -170,7 +170,9 @@ const show = async function(req, res) {
 };
 
 const all = function (req, res) {
-    Lesson.find({})
+    const dateNow = dayjs(new Date()).format("YYYY-MM-DD");
+
+    Lesson.find({date: {$gte: dateNow}})
         .populate('student')
         .sort('date')
         .sort('time')
