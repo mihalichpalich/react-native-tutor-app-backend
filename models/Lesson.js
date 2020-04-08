@@ -6,6 +6,9 @@ const LessonSchema = new Schema(
         unit: String,
         date: String,
         time: String,
+        rate_lesson: Number,
+        rate_homework: Number,
+        homework: String,
         student: {type: Schema.Types.ObjectId, ref: "Student"}
     },
     {

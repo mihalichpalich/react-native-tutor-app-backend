@@ -17,7 +17,10 @@ const create = async function(req, res) {
         student: req.body.student,
         unit: req.body.unit,
         date: req.body.date,
-        time: req.body.time
+        time: req.body.time,
+        rate_lesson: req.body.rate_lesson,
+        rate_homework: req.body.rate_homework,
+        homework: req.body.homework
     };
 
     if (!errors.isEmpty()) {
@@ -49,8 +52,18 @@ const create = async function(req, res) {
                 .split('.')
                 .reverse()
                 .join('.')}T${data.time}`)
-            .subtract(1, 'minute')
+            .subtract(2, 'hour')
             .unix();
+
+        sendSMS({
+            number: student.phone,
+            time: Date.now(),
+            text: `Добрый день, ${student.fullname}! На ${data.date} вам нужно сделать задание: ${data.homework}`
+        }).then(({data}) => {
+            console.log(data);
+        }).catch(err => {
+            console.log(err);
+        });
 
         sendSMS({
             number: student.phone,
@@ -75,7 +88,10 @@ const update = async function(req, res) {
     const data = {
         unit: req.body.unit,
         date: req.body.date,
-        time: req.body.time
+        time: req.body.time,
+        rate_lesson: req.body.rate_lesson,
+        rate_homework: req.body.rate_homework,
+        homework: req.body.homework
     };
 
     if (!errors.isEmpty()) {
