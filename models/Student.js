@@ -8,7 +8,8 @@ const StudentSchema = new Schema(
         phone: {
             type: String,
             unique: true
-        }
+        },
+        user: {type: Schema.Types.ObjectId, ref: "User"}
     },
     {
         timestamps: true

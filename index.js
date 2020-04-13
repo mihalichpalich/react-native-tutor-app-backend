@@ -3,8 +3,9 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 
 const db = require('./core/db');
-const {studentValidation, lessonValidation} = require('./utils/validations');
-const {StudentCtrl, LessonCtrl} = require('./controllers');
+const {studentValidation, lessonValidation, userValidation} = require('./utils/validations');
+const {StudentCtrl, LessonCtrl, UserCtrl} = require('./controllers');
+const checkAuth = require('./middlewares/checkAuth');
 
 dotenv.config();
 
@@ -12,13 +13,19 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
+app.use(checkAuth);
 
-app.get('/students', StudentCtrl.all);
-app.get('/students/:id', StudentCtrl.show);
+app.get('/user/:id', UserCtrl.show);
+app.post('/user/registration', userValidation.create, UserCtrl.create);
+app.post('/user/login', UserCtrl.login);
+app.patch('/user/:id', userValidation.create, UserCtrl.updatePasswordInputPhone);
+
+app.get('/students/all/:user_id', StudentCtrl.all);
+app.get('/students/:student_id', StudentCtrl.show);
 app.get('/students/getbyphone/:phone', StudentCtrl.getByPhone);
-app.post('/students', studentValidation.create, StudentCtrl.create);
-app.delete('/students/:id', StudentCtrl.remove);
-app.patch('/students/:id', studentValidation.create, StudentCtrl.update);
+app.post('/students/:user_id', studentValidation.create, StudentCtrl.create);
+app.delete('/students/:student_id', StudentCtrl.remove);
+app.patch('/students/:student_id', studentValidation.create, StudentCtrl.update);
 
 app.get('/lesson', LessonCtrl.all);
 app.get('/lesson/:id', LessonCtrl.show);

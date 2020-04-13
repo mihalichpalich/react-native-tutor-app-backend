@@ -9,7 +9,8 @@ const create = function(req, res) {
 
     const data = {
         fullname: req.body.fullname,
-        phone: req.body.phone
+        phone: req.body.phone,
+        user: req.params.user_id
     };
 
     if (!errors.isEmpty()) {
@@ -35,7 +36,7 @@ const create = function(req, res) {
 };
 
 const update = async function(req, res) {
-    const studentId = req.params.id;
+    const studentId = req.params.student_id;
     const errors = validationResult(req);
 
     const data = {
@@ -75,7 +76,7 @@ const update = async function(req, res) {
 };
 
 const remove = async function (req, res) {
-    const id = req.params.id;
+    const id = req.params.student_id;
 
     try {
         await Student.findOne({ _id: id });
@@ -101,7 +102,7 @@ const remove = async function (req, res) {
 };
 
 const show = async function(req, res) {
-    const id = req.params.id;
+    const id = req.params.student_id;
 
     try {
         const student = await Student.findById(id).populate({path: 'lessons', options: {sort: {date: 1, time: 1}}}).exec();
@@ -136,20 +137,22 @@ const getByPhone = async function(req, res) {
     }
 };
 
-const all = function (req, res) {
-    Student.find({}, function (err, docs) {
-        if (err) {
-            return res.status(500).json({
-                status: false,
-                message: err
-            });
-        }
+const all = async function (req, res) {
+    const userId = req.params.user_id;
+
+    try {
+        const students = await Student.find({user: userId});
 
         res.json({
             status: true,
-            data: docs
+            data: {students}
         });
-    });
+    } catch (e) {
+        return res.status(404).json({
+            status: false,
+            message: 'STUDENTS_NOT_FOUND'
+        });
+    }
 };
 
 StudentController.prototype = {
