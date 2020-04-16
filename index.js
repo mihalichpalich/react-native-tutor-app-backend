@@ -13,11 +13,14 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
-app.use(checkAuth);
+// app.use(checkAuth);
 
 app.get('/user/:id', UserCtrl.show);
 app.post('/user/registration', userValidation.create, UserCtrl.create);
-app.post('/user/login', UserCtrl.login);
+app.get('/user/getbyphone/:phone', UserCtrl.getByPhone);
+app.get('/user/getconfirmcode/:id', UserCtrl.getConfirmCode);
+app.get('/user/confirm/:id', UserCtrl.confirm);
+app.use(checkAuth).post('/user/login', userValidation.create, UserCtrl.login);
 app.patch('/user/:id', userValidation.create, UserCtrl.updatePasswordInputPhone);
 
 app.get('/students/all/:user_id', StudentCtrl.all);

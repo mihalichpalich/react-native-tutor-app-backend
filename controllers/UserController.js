@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 
 const {User} = require('../models');
 const createJWToken = require('../utils/createJWToken');
+const {sendSMS} = require('../utils');
 
 function UserController() {
 }
@@ -14,13 +15,13 @@ const create = function(req, res) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    const recoveryCode = getRandomInt(1000, 9999);
+    const confirmationCode = getRandomInt(1000, 9999);
 
     const data = {
-        login: req.body.login,
         phone: req.body.phone,
         password: req.body.password,
-        recovery_code: recoveryCode
+        confirmation_code: confirmationCode,
+        confirmed: false
     };
 
     if (!errors.isEmpty()) {
@@ -43,6 +44,60 @@ const create = function(req, res) {
             data: doc
         });
     })
+};
+
+const getByPhone = async function(req, res) {
+    const phone = req.params.phone;
+
+    try {
+        const user = await User.findOne({phone: phone}).exec();
+
+        res.json({
+            status: true,
+            data: {user}
+        });
+    } catch (e) {
+        return res.status(404).json({
+            status: false,
+            message: 'USER_NOT_FOUND'
+        });
+    }
+};
+
+const getConfirmCode = function (req, res) {
+    const id = req.params.id;
+
+    User.findById(id, (err, user) => {
+        if (err) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+        res.json(user.confirmation_code);
+
+        sendSMS({
+            number: user.phone,
+            time: Date.now(),
+            text: `Код подтверждения вашего аккаунта: ${user.confirmation_code}`
+        }).then(({data}) => {
+            console.log(data);
+        }).catch(err => {
+            console.log(err);
+        });
+    });
+};
+
+const confirm = function (req, res) {
+    const id = req.params.id;
+
+    User.findOneAndUpdate({_id: id}, {confirmed: true}, {new: true}, (err, user) => {
+        if (err) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+        res.json(user);
+    });
 };
 
 const show = function(req, res) {
@@ -104,15 +159,23 @@ const updatePasswordInputPhone = async function(req, res) {
         })
 };
 
-const login = function(req, res) {
+const login = async function(req, res) {
+    const errors = validationResult(req);
+
     const postData = {
-        login: req.body.login,
+        phone: req.body.phone,
         password: req.body.password
     };
 
-    User.findOne({login: postData.login}, (err, user) => {
+    if (!errors.isEmpty()) {
+        return res.status(422).json({
+            status: false,
+            message: errors.array()
+        });
+    }
 
-        if (err) {
+    User.findOne({phone: postData.phone, confirmed: true}, (err, user) => {
+        if (err || !user) {
             return res.status(404).json({
                 message: "User not found"
             });
@@ -125,9 +188,9 @@ const login = function(req, res) {
                 token
             });
         } else {
-            res.json({
+            res.status(404).json({
                 status: 'error',
-                message: 'incorrect password or email'
+                message: 'incorrect password'
             });
         }
     });
@@ -138,7 +201,10 @@ UserController.prototype = {
     create,
     updatePasswordInputPhone,
     login,
-    show
+    show,
+    getConfirmCode,
+    confirm,
+    getByPhone
 };
 
 module.exports = UserController;

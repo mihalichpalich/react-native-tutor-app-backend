@@ -6,28 +6,18 @@ const {generatePasswordHash} = require('../utils');
 const UserSchema = new Schema(
     {
         id: String,
-        login: {
-            type: String,
-            unique: true
-        },
         phone: {
             type: String,
             unique: true
         },
         password: String,
-        recovery_code: String
+        confirmation_code: String,
+        confirmed: Boolean
     },
     {
         timestamps: true
     }
 );
-
-UserSchema.virtual('students', {
-    ref: 'Student',
-    localField: '_id',
-    foreignField: 'user',
-    justOne: false
-});
 
 UserSchema.pre('save', function(next) {
     const user = this;
