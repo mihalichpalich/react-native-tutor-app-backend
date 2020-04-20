@@ -14,7 +14,9 @@ const create = async function(req, res) {
     let student;
 
     const data = {
+        user: req.body.user,
         student: req.body.student,
+        program_name: req.body.program_name,
         unit: req.body.unit,
         date: req.body.date,
         time: req.body.time,
@@ -55,15 +57,17 @@ const create = async function(req, res) {
             .subtract(2, 'hour')
             .unix();
 
-        sendSMS({
-            number: student.phone,
-            time: Date.now(),
-            text: `Добрый день, ${student.fullname}! На ${data.date} вам нужно сделать задание: ${data.homework}`
-        }).then(({data}) => {
-            console.log(data);
-        }).catch(err => {
-            console.log(err);
-        });
+        if (data.homework) {
+            sendSMS({
+                number: student.phone,
+                time: Date.now(),
+                text: `Добрый день, ${student.fullname}! На ${data.date} вам нужно сделать задание: ${data.homework}`
+            }).then(({data}) => {
+                console.log(data);
+            }).catch(err => {
+                console.log(err);
+            });
+        }
 
         sendSMS({
             number: student.phone,
@@ -86,6 +90,7 @@ const update = async function(req, res) {
     const errors = validationResult(req);
 
     const data = {
+        program_name: req.body.program_name,
         unit: req.body.unit,
         date: req.body.date,
         time: req.body.time,
@@ -123,7 +128,30 @@ const update = async function(req, res) {
                 status: true,
                 data: doc
             });
-    })
+    });
+
+    if (req.body.homework) {
+        let student;
+
+        try {
+            student = await Student.findOne({_id: data.student});
+        } catch (e) {
+            return res.status(404).json({
+                success: false,
+                message: "STUDENT_NOT_FOUND"
+            });
+        }
+
+        sendSMS({
+            number: student.phone,
+            time: Date.now(),
+            text: `Добрый день, ${student.fullname}! На ${data.date} вам нужно сделать задание: ${data.homework}`
+        }).then(({data}) => {
+            console.log(data);
+        }).catch(err => {
+            console.log(err);
+        });
+    }
 };
 
 const remove = async function (req, res) {
@@ -186,30 +214,31 @@ const show = async function(req, res) {
 };
 
 const all = function (req, res) {
+    const userId = req.params.user_id;
     const dateNow = dayjs(new Date()).format("YYYY-MM-DD");
 
-    Lesson.find({date: {$gte: dateNow}})
+    Lesson.find({date: {$gte: dateNow}, user: userId})
         .populate('student')
         .sort('date')
         .sort('time')
         .exec(function (err, docs) {
-        if (err) {
-            return res.status(500).json({
-                status: false,
-                message: err
-            });
-        }
+            if (err) {
+                return res.status(500).json({
+                    status: false,
+                    message: err
+                });
+            }
 
-        res.json({
-            status: "success",
-            data: reduce(
-                groupBy(docs, 'date'),
-                (result, value, key) => {
-                result = [...result, {title: dayjs(key).locale(ruLocale).format('D MMMM'), data: value}];
-                return result;
-            }, [])
+            res.json({
+                status: "success",
+                data: reduce(
+                    groupBy(docs, 'date'),
+                    (result, value, key) => {
+                    result = [...result, {title: dayjs(key).locale(ruLocale).format('D MMMM'), data: value}];
+                    return result;
+                }, [])
+            });
         });
-    });
 };
 
 LessonController.prototype = {

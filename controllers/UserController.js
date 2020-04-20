@@ -2,7 +2,6 @@ const {validationResult} = require('express-validator');
 const bcrypt = require('bcrypt');
 
 const {User} = require('../models');
-const createJWToken = require('../utils/createJWToken');
 const {sendSMS} = require('../utils');
 
 function UserController() {
@@ -182,10 +181,8 @@ const login = async function(req, res) {
         }
 
         if (bcrypt.compareSync(postData.password, user.password)) {
-            const token = createJWToken(user);
             res.json({
-                status: 'success',
-                token
+                status: 'success'
             });
         } else {
             res.status(404).json({

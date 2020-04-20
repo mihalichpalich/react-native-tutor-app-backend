@@ -3,13 +3,16 @@ const {Schema} = mongoose;
 
 const LessonSchema = new Schema(
     {
+        user: {type: Schema.Types.ObjectId, ref: "User"},
+        student: {type: Schema.Types.ObjectId, ref: "Student"},
+        program_name: String,
         unit: String,
         date: String,
         time: String,
         rate_lesson: Number,
         rate_homework: Number,
-        homework: String,
-        student: {type: Schema.Types.ObjectId, ref: "Student"}
+        homework: String
+
     },
     {
         timestamps: true

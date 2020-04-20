@@ -10,7 +10,7 @@ const create = function(req, res) {
     const data = {
         fullname: req.body.fullname,
         phone: req.body.phone,
-        user: req.params.user_id
+        user: req.body.user
     };
 
     if (!errors.isEmpty()) {
