@@ -1,17 +1,11 @@
 const express = require('express');
-const {studentValidation, lessonValidation, userValidation} = require('../utils/validations');
+const {studentValidation, lessonValidation} = require('../utils/validations');
 const {StudentCtrl, LessonCtrl, UserCtrl, ProgramCtrl} = require('../controllers');
 
 const createRoutes = app => {
     app.use(express.json());
 
-    app.get('/user/:id', UserCtrl.show);
-    app.post('/user/registration', userValidation.create, UserCtrl.create);
-    app.get('/user/getbyphone/:phone', UserCtrl.getByPhone);
-    app.get('/user/getconfirmcode/:id', UserCtrl.getConfirmCode);
-    app.get('/user/confirm/:id', UserCtrl.confirm);
-    app.post('/user/login', userValidation.create, UserCtrl.login);
-    app.patch('/user/:id', userValidation.create, UserCtrl.updatePasswordInputPhone);
+    app.post('/user/sigh_in', UserCtrl.signIn);
 
     app.post('/program', ProgramCtrl.create);
     app.patch('/program/:id', ProgramCtrl.update);
