@@ -24,8 +24,27 @@ const signIn = async function(req, res) {
     })
 };
 
+const getByEmail = async function(req, res) {
+    const email = req.params.email;
+
+    try {
+        const user = await User.findOne({email: email}).exec();
+
+        res.json({
+            status: true,
+            data: {user}
+        });
+    } catch (e) {
+        return res.status(404).json({
+            status: false,
+            message: 'USER_NOT_FOUND'
+        });
+    }
+};
+
 UserController.prototype = {
-    signIn
+    signIn,
+    getByEmail
 };
 
 module.exports = UserController;

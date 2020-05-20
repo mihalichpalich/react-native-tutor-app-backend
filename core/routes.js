@@ -5,7 +5,8 @@ const {StudentCtrl, LessonCtrl, UserCtrl, ProgramCtrl} = require('../controllers
 const createRoutes = app => {
     app.use(express.json());
 
-    app.post('/user/sigh_in', UserCtrl.signIn);
+    app.post('/user/sign_in', UserCtrl.signIn);
+    app.get('/user/getbyemail/:email', UserCtrl.getByEmail);
 
     app.post('/program', ProgramCtrl.create);
     app.patch('/program/:id', ProgramCtrl.update);
