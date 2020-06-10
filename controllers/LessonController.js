@@ -180,39 +180,6 @@ const remove = async function (req, res) {
     });
 };
 
-const show = async function(req, res) {
-    const id = req.params.id;
-
-    try {
-        const lesson = await Lesson.findById(id).exec();
-
-        res.json({
-            status: true,
-            data: {...lesson._doc}
-        });
-    } catch (e) {
-        return res.status(404).json({
-            status: false,
-            message: 'LESSON_NOT_FOUND'
-        });
-    }
-
-    Student.findById(id, function (err, docs) {
-        if (err) {
-            return res.status(500).json({
-                status: false,
-                message: err
-            });
-        }
-
-        res.json({
-            status: true,
-            data: docs
-        });
-    });
-
-};
-
 const all = function (req, res) {
     const userId = req.params.user_id;
     const dateNow = dayjs(new Date()).format("YYYY-MM-DD");
@@ -245,8 +212,7 @@ LessonController.prototype = {
     all,
     create,
     remove,
-    update,
-    show
+    update
 };
 
 module.exports = LessonController;

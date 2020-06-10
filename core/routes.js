@@ -21,7 +21,6 @@ const createRoutes = app => {
     app.patch('/students/:student_id', studentValidation.create, StudentCtrl.update);
 
     app.get('/lesson/:user_id', LessonCtrl.all);
-    app.get('/lesson/:id', LessonCtrl.show);
     app.post('/lesson', lessonValidation.create, LessonCtrl.create);
     app.delete('/lesson/:id', LessonCtrl.remove);
     app.patch('/lesson/:id', lessonValidation.update, LessonCtrl.update);
