@@ -1,3 +1,18 @@
-"C:\Program Files\MongoDB\Server\4.0\bin\mongod.exe" --dbpath="c:\data\db"
+Серверная часть для мобильного приложения учета работы с клиентами для частных индивидуальных преподавателей.
 
-"C:\Program Files\MongoDB\Server\4.0\bin\mongo.exe"
+[Клиентская часть на React Native](https://github.com/mihalichpalich/react-native-tutor-app)
+
+**Stack:**
+* Node.js
+* Express
+* Express Validator
+* Axios
+* Lodash
+* MongoDB / Mongoose
+
+Other:
+* cors
+* dayjs
+* dotenv
+* nodemon
+* querystring
